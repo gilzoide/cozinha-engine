@@ -4,18 +4,18 @@
 
 local defaults = {}
 
-function defaults.init() end
-
-function defaults.update() end
-
-function defaults.draw() end
-
--- Emits a message, if object supports it
+--- Emits a message, if object supports it.
+-- 
+-- @return[0] `true` if message is supported
+-- @return[0] Function result
+-- @return[1] `false` otherwise
 function defaults.emit(obj, f, ...)
-	if obj[f] then return obj[f](obj, ...) end
+	if obj[f] then return true, obj[f](obj, ...)
+	else return false
+	end
 end
 
--- Append a child at `pos`, which defaults to the end of the tree
+--- Append a child at end of the tree.
 function defaults.add_child(self, obj)
 	table.insert(self.children, obj)
 	return obj

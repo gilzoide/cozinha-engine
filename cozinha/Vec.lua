@@ -26,20 +26,20 @@ function Vec.__mul(self, other)
 	if is_Vec(other) then x, y = other.x, other.y else x, y = other, other end
 	return Vec.new(self.x * x, self.y * y)
 end
-
 function Vec.__unm(self)
 	return Vec.new(-self.x, -self.y)
 end
+
+function Vec.xy(self)
+	return self.x, self.y
+end
+function Vec.clone(self)
+	return Vec.new(self.x, self.y)
+end
+
 function Vec.norm(self)
 	return (self.x * self.x + self.y * self.y) ^ 0.5
 end
-
-function Vec.translate(self, other)
-	local x, y
-	if is_Vec(other) then x, y = other.x, other.y else x, y = other, other end
-	self.x, self.y = self.x + x, self.y + y
-end
-
 function Vec.normalize(self)
 	if self.x ~= 0 or self.y ~= 0 then
 		local norm = self:norm()
@@ -47,6 +47,9 @@ function Vec.normalize(self)
 		self.y = self.y / norm
 	end
 	return self
+end
+function Vec.normalized(self)
+	return self:clone():normalize()
 end
 
 return Vec

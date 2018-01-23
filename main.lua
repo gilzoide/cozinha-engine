@@ -7,3 +7,4 @@ require 'cozinha'
 -- cozinha.script_folder = "scripts"
 -- cozinha.scene_folder = "scenes"
 -- cozinha.main_scene = "main.lua"
+-- cozinha.debug = false

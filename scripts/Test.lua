@@ -3,7 +3,7 @@
 -- arrows.
 --]]
 function init(self)
-	self.text = self:add_child(Text.new("oi", 10, 10))
+	self.text = self:add_child(Text.new(nil, "olar"))
 	self.speed = 100
 end
 
@@ -20,5 +20,11 @@ function update(self, dt)
 		inc.x = 1
 	end
 	inc:normalize()
-	self.transform.pos:translate(inc * (self.speed * dt))
+
+	local rot = 0
+	if love.keyboard.isDown "space" then
+		rot = 10
+	end
+
+	self.transform:translate(inc * (self.speed * dt)):rotate(rot * dt)
 end

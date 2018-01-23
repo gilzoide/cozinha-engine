@@ -9,31 +9,63 @@ local Transform = require 'cozinha.Transform'
 
 local prototype = {}
 
-local function create_new(proto)
+local function setup_prototype(proto)
 	-- Make sure the required functions exist
 	for k, v in pairs(defaults) do
-		proto[k] = proto[k] or v
+		proto[k] = v
 	end
 	-- And create the constructor
 	function proto.new(...)
 		local self = {__index = proto, children = {}, transform = Transform.new()}
 		setmetatable(self, self)
-		self:init(...)
+		self:emit("init", ...)
 		return self
 	end
 end
 
-local function create_proto(file, proto_name)
-	local proto = {__index = _ENV}
-	setmetatable(proto, proto)
-	local f = assert(loadfile(file))
-	setfenv(f, proto)()
-	create_new(proto)
-	-- register prototype globally
-	_ENV[proto_name] = proto
+--- Check if there will be no extend cycle if `child` extends `base`.
+-- 
+-- Extending scripts by only setting `__index` may enter infinite loops if
+-- there is a cycle.
+local function check_uncyclic_extend(base, child)
+	local visited = {
+		[child.__cozinha] = true
+	}
+	local current = base
+	while current ~= _ENV do
+		if visited[current.__cozinha] then return false end
+		visited[current.__cozinha] = true
+		current = current.__index
+	end
+	return true
 end
 
-local function import_drectory(dir_name)
+function extends(base)
+	assert(base.__cozinha ~= nil, "Can only extend a cozinha prototype")
+	local proto = getfenv(2)
+	assert(proto.__cozinha ~= nil, "Only cozinha prototypes can be extended")
+	-- verify that there is no extend cycle 
+	assert(check_uncyclic_extend(base, proto), string.format(
+	       "%q extending %q would form a cycle", proto.__cozinha, base.__cozinha))
+	proto.__index = base
+end
+
+local function create_proto(file, proto_name)
+	local f = assert(loadfile(file))
+	assert(_ENV[proto_name] == nil,
+	       string.format("%q cozinha script is already registered", proto_name))
+
+	local proto = {__index = _ENV, __cozinha = proto_name}
+	setmetatable(proto, proto)
+	-- register prototype globally
+	_ENV[proto_name] = proto
+	-- prototype initial setup 
+	setup_prototype(proto)
+
+	setfenv(f, proto)()
+end
+
+local function import_directory(dir_name)
 	assert(lfs.isDirectory(dir_name), string.format("Couldn't find folder %q", dir_name))
 	local filesTable = lfs.getDirectoryItems(dir_name)
 	for _, file in ipairs(filesTable) do
@@ -48,8 +80,8 @@ local function import_drectory(dir_name)
 end
 
 function prototype.readScripts()
-	import_drectory("cozinha/scripts")
-	import_drectory(script_folder)
+	import_directory("cozinha/scripts")
+	import_directory(script_folder)
 end
 
 return prototype

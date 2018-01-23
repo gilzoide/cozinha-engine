@@ -1,7 +1,7 @@
-function init(self, text)
-	self.text = text or ""
+extends(Drawable)
+
+function init(self, font, text)
+	font = font or love.graphics.getFont()
+	self.drawable = love.graphics.newText(font, text)
 end
 
-function draw(self)
-	love.graphics.print(self.text, self.transform.pos.x + Transform.pos.x, self.transform.pos.y + Transform.pos.y)
-end
