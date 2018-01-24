@@ -1,6 +1,8 @@
 --[[
--- Example of a Scene, where the `scene` global variable represents itself.
+-- Example of a Scene, where the `scene` environment variable represents itself.
 --]]
-scene:add_child(Menu.new())
-scene:add_child(Drawable.new())
-scene:add_child(Test.new())
+scene:add_children(
+	Test.new(),
+	Test.new(true):translate(100, 100)
+)
+

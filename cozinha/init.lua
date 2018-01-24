@@ -11,6 +11,7 @@ _ENV = getfenv()
 local prototype = require 'cozinha.prototype'
 local dbg = require 'cozinha.debugger'
 Vec = require 'cozinha.Vec'
+Transform = require 'cozinha.Transform'
 
 function love.load()
 	script_folder = cozinha.script_folder or "scripts"
@@ -23,6 +24,7 @@ function love.load()
 		prototype.readScripts()
 	end
 	current_scene = Scene.from_file(main_scene)
+	cozinha.transform = Transform.new()
 	nk.init()
 end
 
@@ -31,7 +33,7 @@ local function apply_preorder(f, root, ...)
 	local children = root.children
 	for i = 1, #children do
 		local c = children[i]
-		_ENV.Transform = root.transform + c.transform
+		cozinha.transform = root.transform + c.transform
 		apply_preorder(f, c, ...)
 	end
 	root:emit(f, ...)

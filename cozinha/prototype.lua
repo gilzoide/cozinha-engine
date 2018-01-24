@@ -4,16 +4,12 @@
 --]]
 
 local lfs = love.filesystem
-local defaults = require 'cozinha.defaults'
+local Node = require 'cozinha.Node'
 local Transform = require 'cozinha.Transform'
 
 local prototype = {}
 
 local function setup_prototype(proto)
-	-- Make sure the required functions exist
-	for k, v in pairs(defaults) do
-		proto[k] = v
-	end
 	-- And create the constructor
 	function proto.new(...)
 		local self = {__index = proto, children = {}, transform = Transform.new()}
@@ -32,7 +28,7 @@ local function check_uncyclic_extend(base, child)
 		[child.__cozinha] = true
 	}
 	local current = base
-	while current ~= _ENV do
+	while current ~= Node do
 		if visited[current.__cozinha] then return false end
 		visited[current.__cozinha] = true
 		current = current.__index
@@ -55,7 +51,7 @@ local function create_proto(file, proto_name)
 	assert(_ENV[proto_name] == nil,
 	       string.format("%q cozinha script is already registered", proto_name))
 
-	local proto = {__index = _ENV, __cozinha = proto_name}
+	local proto = {__index = Node, __cozinha = proto_name}
 	setmetatable(proto, proto)
 	-- register prototype globally
 	_ENV[proto_name] = proto

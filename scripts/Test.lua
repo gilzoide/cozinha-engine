@@ -2,8 +2,8 @@
 -- Example of a Script Object: a floating text that moves with the keyboard
 -- arrows.
 --]]
-function init(self)
-	self.text = self:add_child(Text.new(nil, "olar"))
+function init(self, centered)
+	self.text = self:add_child(Text.new(nil, "olar")):setCentered(centered)
 	self.speed = 100
 end
 
